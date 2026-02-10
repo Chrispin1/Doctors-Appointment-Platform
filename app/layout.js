@@ -1,13 +1,8 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Jost } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jost = Jost({
+  variable: "--font-jost",
   subsets: ["latin"],
 });
 
@@ -19,11 +14,16 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={`${jost.className} antialiased`}>
+        {/* header */}
+        <main className="min-h-screen">{children}</main>
       </body>
+      {/* footer */}
+      <footer className="py-4">
+        <div className="container mx-auto text-center text-gray-500">
+          <p className="text-md"> Made with ❤️ by Xtra</p>
+        </div>
+      </footer>
     </html>
   );
 }
