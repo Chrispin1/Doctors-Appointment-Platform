@@ -1,3 +1,11 @@
+import { Button } from "@/components/ui/button";
+
 export default function Home() {
-  return <h1 className="text-3xl font-bold">Welcome to the Health App</h1>;
+  return (
+    <div className="py-32 ">
+      <h1>Subscribe to Roadside Coder</h1>
+      <br />
+      <Button>Subscribe</Button>
+    </div>
+  );
 }
