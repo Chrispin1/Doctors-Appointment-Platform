@@ -1,4 +1,4 @@
-import { Jost } from "next/font/google";
+import { Jost, Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/themeProvider";
 import Header from "@/components/header";
@@ -11,6 +11,11 @@ import {
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
+
+const grotesque = Bricolage_Grotesque({
+  variable: "--font-bricolage-grotesque",
+  subsets: ["latin"],
+});
 
 const jost = Jost({
   variable: "--font-jost",
@@ -30,7 +35,7 @@ export default function RootLayout({ children }) {
         theme: dark,
       }}>
       <html lang="en" suppressHydrationWarning>
-        <body className={`${jost.className} antialiased`}>
+        <body className={`${grotesque.variable} ${jost.variable} antialiased`}>
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
@@ -39,7 +44,7 @@ export default function RootLayout({ children }) {
             {/* header */}
             <Header />
             <main className="min-h-screen">{children}</main>
-            <footer className="py-4">
+            <footer className="bg-muted/30 py-12">
               <div className="container mx-auto text-center text-gray-500">
                 <p className="text-md"> Made with ❤️ by Xtra</p>
               </div>
