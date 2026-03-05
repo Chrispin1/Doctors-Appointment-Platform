@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model User{
+  id                String        @id @default(uuid())
+  clerkUserId       String        @unique //clerk user id
+  email             String        @unique
+  name              String? 
+  imageUrl          String?
+  role              UserRole      @default(UNASSIGNED)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  //patients specific fields
+  credits           Int           @default(2)
+
+  //doctors specific fields
+  specialty         String?
+  experience        Int?          //years of experience
+  credentialUrl     String?       //document url
+  description       String?      @db.Text
+  verificationStatus VerificationStatus? @default(PENDING)
+
+  //relations
+  patientAppointments   Appointment[]   @relation("PatientAppointments")
+  doctorAppointments    Appointment[]   @relation("DoctorAppointments")
+  availabilities        Availability[]
+  transactions          creditTransaction[]
+}
+
+enum UserRole{
+  UNASSIGNED
+  PATIENT
+  DOCTOR 
+  ADMIN
+}
+
+enum VerificationStatus{
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+model Availability{
+  id          String      @id @default(uuid())
+  doctorId    String
+  doctor      User        @relation(fields:[doctorId],references:[id],onDelete:Cascade)
+  startTime   DateTime
+  endTime     DateTime
+  status      SlotStatus  @default(AVAILABLE)
+
+  @@index([doctorId,startTime])
+}
+
+enum SlotStatus{
+  AVAILABLE
+  BOOKED
+  BLOCKED
+}
+
+model Appointment{
+  id              String    @id @default(uuid())  
+  patientId       String
+  patient         User      @relation("PatientAppointments",fields:[patientId],references:[id])
+  doctorId        String
+  doctor          User      @relation("DoctorAppointments",fields:[doctorId],references:[id])
+  startTime       DateTime
+  endTime         DateTime
+  status          AppointmentStatus   @default(SCHEDULED)
+  notes           String?   @db.Text
+  patientDescription  String?  @db.Text
+  
+
+  //video session fields
+  videoSessionId        String?   
+  videoSessionToken     String?   
+
+  createdAt       DateTime    @default(now())
+  updateAt        DateTime    @updatedAt
+
+  @@index([status,startTime])
+  @@index([doctorId,startTime])
+}
+
+enum AppointmentStatus{
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+model creditTransaction{
+  id           String     @id @default(uuid())
+  userId       String
+  user         User       @relation(fields:[userId],references:[id],onDelete:Cascade)
+  amount       Int        //positive for additions, negative for usage
+  type         TransactionType
+  packageId    String?    //Reference to which package was purchased
+  createdAt    DateTime   @default(now())
+}
+
+enum TransactionType{
+  CREDIT_PURCHASE
+  APPOINTMENT_DEDUCTION
+  ADMIN_ADJUSTMENT
+}
